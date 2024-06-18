@@ -1,6 +1,29 @@
 use std::{fs, io::Read};
+mod reader;
 
 pub struct Pdf {
+    header: Header,
+}
+
+struct Header {
+    version: Version,
+}
+
+#[derive(PartialEq, Debug)]
+enum Version {
+    Unknown,
+    V1_0,
+    V1_1,
+    V1_2,
+    V1_3,
+    V1_4,
+    V1_5,
+    V1_6,
+    V1_7,
+}
+
+pub fn show_pdf(pdf: &Pdf) {
+    println!("version: {:?}", pdf.header.version);
 }
 
 pub fn get_pdf(path: &str) -> Pdf {
@@ -15,5 +38,12 @@ pub fn get_pdf(path: &str) -> Pdf {
         Err(e) => panic!("Failed to read file: {e}"),
     };
 
-    Pdf {}
+    let mut iter = buf.iter();
+
+    let pdf = match reader::parse_file(&mut iter) {
+        Ok(pdf) => pdf,
+        Err(e) => panic!("Failed to parse file: {e}"),
+    };
+
+    return pdf;
 }

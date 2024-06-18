@@ -1,12 +1,13 @@
 use std::env;
 
-use pdf::get_pdf;
+use pdf::{get_pdf, show_pdf};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
     let args = parse_args(&args);
 
-    get_pdf(&args.pdf_path);
+    let pdf = get_pdf(&args.pdf_path);
+    show_pdf(&pdf);
 }
 
 struct Arguments {
