@@ -53,11 +53,3 @@ fn separate_lines(iter: &std::slice::Iter<u8>) -> Vec<Vec<u8>> {
 
     lines
 }
-
-fn _skip_somment(iter: &mut std::slice::Iter<u8>) {
-    while let Some(next) = iter.next() {
-        if next == &b'\n' {
-            return;
-        }
-    }
-}
