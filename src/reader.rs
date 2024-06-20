@@ -3,16 +3,16 @@ use std::io;
 use crate::{Header, Pdf, Version};
 
 pub fn parse_file(iter: &mut std::slice::Iter<u8>) -> Result<Pdf, io::Error> {
-    let header = parse_header(iter)?;
+    let lines = separate_lines(iter);
+    let mut iter = lines.iter();
+
+    let header = parse_header(&mut iter)?;
 
     Ok(Pdf { header })
 }
 
-fn parse_header(iter: &mut std::slice::Iter<u8>) -> Result<Header, io::Error> {
-    let version: Vec<u8> = iter
-        .take_while(|c| c.is_ascii_graphic())
-        .cloned()
-        .collect();
+fn parse_header(iter: &mut std::slice::Iter<Vec<u8>>) -> Result<Header, io::Error> {
+    let version = iter.next().unwrap();
 
     if let Ok(str) = String::from_utf8(version.clone()) {
         let version = match str.as_str() {
@@ -28,7 +28,6 @@ fn parse_header(iter: &mut std::slice::Iter<u8>) -> Result<Header, io::Error> {
         };
 
         if version != Version::Unknown {
-            skip_somment(iter);
             return Ok(Header { version });
         } else {
             let error = io::Error::new(io::ErrorKind::InvalidData, "Unknown version");
@@ -40,7 +39,22 @@ fn parse_header(iter: &mut std::slice::Iter<u8>) -> Result<Header, io::Error> {
     return Err(error);
 }
 
-fn skip_somment(iter: &mut std::slice::Iter<u8>) {
+fn separate_lines(iter: &std::slice::Iter<u8>) -> Vec<Vec<u8>> {
+    let all: Vec<u8> = iter
+        .clone()
+        .cloned()
+        .collect();
+
+    let lines: Vec<Vec<u8>> = all
+        .split(|c| c == &b'\n')
+        .map(|l| l.to_vec())
+        .collect()
+        ;
+
+    lines
+}
+
+fn _skip_somment(iter: &mut std::slice::Iter<u8>) {
     while let Some(next) = iter.next() {
         if next == &b'\n' {
             return;
