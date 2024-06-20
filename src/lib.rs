@@ -22,6 +22,12 @@ enum Version {
     V1_7,
 }
 
+struct IndirectObject {
+    _id: u32,
+    _generation: u32,
+    _desc: String,
+}
+
 pub fn show_pdf(pdf: &Pdf) {
     println!("version: {:?}", pdf.header.version);
 }
